@@ -1,8 +1,8 @@
 /*
  * SPConfig.cpp
  *
- *  Created on: 31 αιεμ 2016
- *      Author: πβδ
+ *  Created on: 31 Γ‘Γ©Γ₯Γ¬ 2016
+ *      Author: Γ°Γ’Γ€
  */
 #include "SPConfig.h"
 
