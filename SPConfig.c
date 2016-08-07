@@ -1,9 +1,3 @@
-/*
- * SPConfig.cpp
- *
- *  Created on: 31 ביול 2016
- *      Author: נגה
- */
 #include "SPConfig.h"
 
 typedef enum {RANDOM,MAX_SPREAD,INCREMENTAL} SDKTreeSpresd;
@@ -425,7 +419,6 @@ void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG
 	return;
 }
 
-
 bool spConfigIsExtractionMode(const SPConfig config, SP_CONFIG_MSG* msg){
 	if (isEmpty(config)){
 		*msg = SP_CONFIG_INVALID_ARGUMENT;
@@ -478,38 +471,22 @@ int spConfigGetPCADim(const SPConfig config, SP_CONFIG_MSG* msg){
 }
 
 
-/**
- * Given an index 'index' the function stores in imagePath the full path of the
- * ith image.
- *
- * For example:
- * Given that the value of:
- *  spImagesDirectory = "./images/"
- *  spImagesPrefix = "img"
- *  spImagesSuffix = ".png"
- *  spNumOfImages = 17
- *  index = 10
- *
- * The functions stores "./images/img10.png" to the address given by imagePath.
- * Thus the address given by imagePath must contain enough space to
- * store the resulting string.
- *
- * @param imagePath - an address to store the result in, it must contain enough space.
- * @param config - the configuration structure
- * @param index - the index of the image.
- *
- * @return
- * - SP_CONFIG_INVALID_ARGUMENT - if imagePath == NULL or config == NULL
- * - SP_CONFIG_INDEX_OUT_OF_RANGE - if index >= spNumOfImages
- * - SP_CONFIG_SUCCESS - in case of success
- */
+
 SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config, int index){
+	if (index> config->spNumOfImages-1){
+		return SP_CONFIG_INDEX_OUT_OF_RANGE;
+	}
+    if (isEmpty(config)){
+    	return SP_CONFIG_INVALID_ARGUMENT;
+    }
+    if (imagePath == NULL){
+    	return SP_CONFIG_INVALID_ARGUMENT;
+    }
 	/**
 	 * varibales
 	 */
-    int src_fd, dst_fd, n, err,NumOfImages;
-    unsigned char buffer[4096];
-    char * src_path, dst_path, ImagesDirectory,ImagesPrefix,ImagesSuffix;
+
+    char * src_path, ImagesDirectory,ImagesPrefix,ImagesSuffix;
     /**
      * concat ImagesDirectory + ImagesPrefix + index.str + ImagesSuffix
      */
@@ -524,47 +501,52 @@ SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config, int i
     strcat(src_path, indexStr);
     strcat(src_path, ImagesSuffix);
     /**
-      * concat ImagesDirectory + ImagesPrefix + index.str + ImagesSuffix
+      * store "./images/img10.png" to the address given by imagePath
       */
+    *imagePath = *src_path;
+    free (src_path);
+    return SP_CONFIG_SUCCESS ;
+}
 
-    src_fd = open(src_path, O_RDONLY);
-    dst_fd = open(dst_path, O_CREAT | O_WRONLY);
 
-    while (1) {
-        err = read(src_fd, buffer, 4096);
-        if (err == -1) {
-            printf("Error reading file.\n");
-            exit(1);
-        }
-        n = err;
+SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config){
 
-        if (n == 0) break;
-
-        err = write(dst_fd, buffer, n);
-        if (err == -1) {
-            printf("Error writing to file.\n");
-            exit(1);
-        }
+    if (isEmpty(config)){
+    	return SP_CONFIG_INVALID_ARGUMENT;
     }
+    if (pcaPath == NULL){
+    	return SP_CONFIG_INVALID_ARGUMENT;
+    }
+	/**
+	 * varibales
+	 */
 
-    close(src_fd);
-    close(dst_fd);
+    char * src_path, ImagesDirectory,PcaFilename;
+    /**
+     * concat ImagesDirectory + ImagesPrefix + index.str + ImagesSuffix
+     */
+    ImagesDirectory = config ->spImagesDirectory;
+    PcaFilename = config ->spPCAFilename;
+
+    src_path = malloc(strlen(ImagesDirectory)+strlen(PcaFilename)+1);
+    strcpy(src_path, ImagesDirectory);
+    strcat(src_path, PcaFilename);
+    /**
+      * store "./images/img10.png" to the address given by imagePath
+      */
+    *pcaPath = *src_path;
+    free (src_path);
+    return SP_CONFIG_SUCCESS ;
 }
-}
-
-
-SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config);
 
 
 void spConfigDestroy(SPConfig config){
-
-	free(config->spImagesDirectory);
-	free(config->spImagesPrefix);
-	free(config->spImagesSuffix);
-	free(config->spPCAFilename);
-	free(config->spLoggerFilename);
-	free(config);
-
+	free (config->spImagesDirectory);
+	free (config->spImagesPrefix);
+	free (config->spImagesSuffix);
+	free (config->spPCAFilename);
+	free (config->spLoggerFilename);
+	free (config);
 }
 
 bool isEmpty (const SPConfig config){
@@ -574,7 +556,3 @@ bool isEmpty (const SPConfig config){
 	return false;
 
 }
-
-
-
-
