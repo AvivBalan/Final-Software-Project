@@ -1,10 +1,3 @@
-/*
- * SPConfig_unit_test.c
- *
- *  Created on: 7 баев 2016
- *      Author: рвд
- */
-
 #include "unit_test_util.h"
 #include "SPConfig.h"
 #include <stdlib.h>
@@ -46,7 +39,7 @@ static bool testspConfigCreate(){
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
 	char * filename = "filename";
 	// normal inputs
-	SPConfig config = spConfigCreate(filename, msg);
+	SPConfig config = spConfigCreate("config_unit_testing_1.txt", msg);
 	ASSERT_TRUE(config!=NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
@@ -60,44 +53,39 @@ static bool testspConfigCreate(){
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_CANNOT_OPEN_FILE);
 	spConfigDestroy(config);
-	// allocation failure occurred
-	config = spConfigCreate(filename, msg);
-	ASSERT_TRUE(config==NULL);
-	ASSERT_TRUE(msg==SP_CONFIG_ALLOC_FAIL);
-	spConfigDestroy(config);
 	//line in the config file contains invalid integer
 	filename = "file with invalid integer";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_2.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_INTEGER);
 	spConfigDestroy(config);
 	//line in the config file contains invalid string
 	filename = "file with invalid string";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_3.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_STRING);
 	spConfigDestroy(config);
 	//spImagesDirectory is missing
 	filename = "file with spImagesDirectory missing";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_4.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_MISSING_DIR);
 	spConfigDestroy(config);
 	//spImagesPrefix is missing
 	filename = "file with spImagesPrefix is missing";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_5.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_MISSING_PREFIX);
 	spConfigDestroy(config);
 	//spImagesSuffix is missing
 	filename = "file with spImagesSuffix is missing";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_6.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_MISSING_SUFFIX);
 	spConfigDestroy(config);
 	//spNumOfImages is missing
 	filename = "file with spNumOfImages is missing";
-	config = spConfigCreate(filename, msg);
+	config = spConfigCreate("config_unit_testing_7.txt", msg);
 	ASSERT_TRUE(config==NULL);
 	ASSERT_TRUE(msg==SP_CONFIG_MISSING_NUM_IMAGES);
 	spConfigDestroy(config);
