@@ -1,0 +1,19 @@
+spImagesDirectory = ./images/
+#comment 1
+spImagesPrefix =img
+
+spImagesSuffix= .png 
+#comment 2
+#comment 3
+
+	spNumOfImages=17
+spMinimalGUI=true
+spKDTreeSplitMethod = MAX_SPREAD
+spPCAFilename = pca.yml
+spExtractionMode		= true 
+spNumOfFeatures=80
+spPCADimension= 	15
+spNumOfSimilarImages=2
+ 	 	 	spKNN				=    1 		 
+spLoggerLevel=4
+spLoggerFilename			=  stdout
