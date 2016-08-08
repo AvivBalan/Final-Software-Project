@@ -107,7 +107,7 @@ static bool testspConfigCreate(){
 static bool testspConfigIsExtractionMode (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -118,7 +118,7 @@ static bool testspConfigIsExtractionMode (){
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_ARGUMENT);
 	// normal input
 	ExtractionMode = spConfigIsExtractionMode (config, msg);
-	ASSERT_TRUE(ExtractionMode==config->ExtractionMode);
+	ASSERT_TRUE(ExtractionMode==true);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
 	free (msg);
@@ -139,7 +139,7 @@ static bool testspConfigIsExtractionMode (){
 static bool testspConfigMinimalGui (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -150,7 +150,7 @@ static bool testspConfigMinimalGui (){
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_ARGUMENT);
 	// normal input
 	MinimalGui = spConfigMinimalGui (config, msg);
-	ASSERT_TRUE(MinimalGui==config->MinimalGui);
+	ASSERT_TRUE(MinimalGui==true);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
 	free (msg);
@@ -172,7 +172,7 @@ static bool testspConfigMinimalGui (){
 static bool testspConfigGetNumOfImages (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -183,7 +183,7 @@ static bool testspConfigGetNumOfImages (){
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_ARGUMENT);
 	// normal input
 	NumOfImages = spConfigGetNumOfImages (config, msg);
-	ASSERT_TRUE(NumOfImages==config->NumOfImages);
+	ASSERT_TRUE(NumOfImages==10);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
 	free (msg);
@@ -206,7 +206,7 @@ static bool testspConfigGetNumOfImages (){
 static bool testspConfigGetNumOfFeatures (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -217,7 +217,7 @@ static bool testspConfigGetNumOfFeatures (){
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_ARGUMENT);
 	// normal input
 	NumOfFeatures = spConfigGetNumOfFeatures (config, msg);
-	ASSERT_TRUE(NumOfFeatures==config->NumOfFeatures);
+	ASSERT_TRUE(NumOfFeatures==80);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
 	free (msg);
@@ -239,7 +239,7 @@ static bool testspConfigGetNumOfFeatures (){
 static bool testspConfigGetPCADim (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -250,7 +250,7 @@ static bool testspConfigGetPCADim (){
 	ASSERT_TRUE(msg==SP_CONFIG_INVALID_ARGUMENT);
 	// normal input
 	PCADim = spConfigGetPCADim (config, msg);
-	ASSERT_TRUE(PCADim==config->PCADim);
+	ASSERT_TRUE(PCADim==15);
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
 	free (msg);
@@ -285,8 +285,8 @@ static bool testspConfigGetPCADim (){
 static bool testspConfigGetImagePath (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
-	char* imagePath = "imagePath";
+	char * filename = "config_unit_testing_1.txt";
+	char* imagePath = (char*)malloc (sizeof(char)*50);
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -301,9 +301,10 @@ static bool testspConfigGetImagePath (){
 	ASSERT_TRUE(msg==SP_CONFIG_INDEX_OUT_OF_RANGE);
 	//success
 	msg = spConfigGetImagePath(imagePath, config,1);
-	ASSERT_TRUE( *imagePath == "imagePathNew");
+	ASSERT_TRUE( *imagePath == "./images/img1.png");
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
+	free (imagePath);
 	free (msg);
 	return true;
 }
@@ -329,8 +330,8 @@ static bool testspConfigGetImagePath (){
 static bool testspConfigGetPCAPath (){
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
-	char* pcaPath = "pcaPath";
+	char * filename = "config_unit_testing_1.txt";
+	char* pcaPath = (char*)malloc (sizeof(char)*50);
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 
@@ -343,9 +344,10 @@ static bool testspConfigGetPCAPath (){
 
 	//success
 	msg = spConfigGetPCAPath(pcaPath, config);
-	ASSERT_TRUE( *pcaPath == "pcaPathNew");
+	ASSERT_TRUE( *pcaPath == "./images/pca.yml");
 	ASSERT_TRUE(msg==SP_CONFIG_SUCCESS);
 	spConfigDestroy(config);
+	free (pcaPath);
 	free (msg);
 	return true;
 }
@@ -360,8 +362,7 @@ static bool testisEmpty (){
 	ASSERT_TRUE(empty == true);
 	SP_CONFIG_MSG* msg;
 	msg = (SP_CONFIG_MSG*)malloc (sizeof(SP_CONFIG_MSG));
-	char * filename = "filename";
-	char* pcaPath = "pcaPath";
+	char * filename = "config_unit_testing_1.txt";
 	// create config
 	SPConfig config = spConfigCreate(filename, msg);
 	empty = isEmpty(config);
