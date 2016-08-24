@@ -3,6 +3,10 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <ctype.h>
 #include "SPLogger.h"
 
 /**
@@ -50,6 +54,8 @@ typedef struct sp_config_t* SPConfig;
  *
  */
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg);
+
+void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG_MSG* msg, int line, const char* filename);
 
 /*
  * Returns true if spExtractionMode = true, false otherwise.
