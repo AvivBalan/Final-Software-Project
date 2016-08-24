@@ -13,7 +13,12 @@ typedef struct SPKDArray{
 
 };
 
-
+struct SPPoint* getPoint (struct SPKDArray arr){
+	return arr->p;
+}
+int** getMatrix (struct SPKDArray arr){
+	return arr->matrix;
+}
 struct SPKDArray Init(struct SPPoint* arr, int size){
 	struct SPKDArray newSPKDArray = (struct SPKDArray)malloc (sizeof (*newSPKDArray));
 	newSPKDArray -> p = copySPPointArray (arr, size);
@@ -89,7 +94,7 @@ int (*comperatorCreator(int dim))(const void *, const void*){
 
 }
 
-int** buidTwoMaps (int* sortedPoints,struct SPPoint* arr ){
+int** buildTwoMaps (int* sortedPoints,struct SPPoint* arr ){
 	int** maps = (int**) malloc (length (sortedPoints)*2);
 	int len = length (sortedPoints);
 	int i =0;
