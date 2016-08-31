@@ -1,7 +1,5 @@
 #include "SPConfig.h"
 
-typedef enum {RANDOM,MAX_SPREAD,INCREMENTAL} SDKTreeSpresd;
-
 struct sp_config_t{
 	char *spImagesDirectory;
 	char *spImagesPrefix;
