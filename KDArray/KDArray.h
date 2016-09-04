@@ -6,14 +6,29 @@
  */
 #include "SPPoint.h"
 
-typedef struct SPKDArray;
+typedef struct sp_kd_Array* SPKDArray;
 
-struct SPKDArray Init(struct SPPoint* arr, int size);
 
-struct SPKDArray**  Split(struct SPKDArray kdArr, int coor);
+SPPoint* getPoint ( SPKDArray arr);
 
-struct SPPoint* copySPPointArray (struct SPPoint*);
+int** getMatrix ( SPKDArray arr);
 
-int** createMatrix (struct SPPoint* arr, int size);
+ SPKDArray Init( SPPoint* arr, int size);
 
-float (*comperatorCreator(int dim))(const void *, const void*);
+ SPKDArray**  Split( SPKDArray kdArr, int coor);
+
+SPPoint* copySPPointArray ( SPPoint* arr, int size);
+
+int compare (const SPPoint *a, const SPPoint *b);
+
+int** createMatrix ( SPPoint* arr, int size);
+
+int** buildTwoMaps (int* sortedPoints);
+
+SPPoint** splitPointArray (int**maps ,  SPPoint* array);
+
+int*** splitMatrixes (int**maps, int**matrix);
+
+void SPKDArrayDestroy (SPKDArray kdArr);
+
+

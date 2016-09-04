@@ -1,13 +1,6 @@
 /*
  * unit_test_util.h
  *
- *  Created on: 23 баев 2016
- *      Author: рвд
- */
-
-/*
- * unit_test_util.h
- *
  *  Created on: 7 баев 2016
  *      Author: рвд
  */
@@ -50,9 +43,6 @@ extern "C" {
 #endif
 
 #endif /* UNIT_TEST_UTIL_H_ */
-
-
-
 
 
 
