@@ -88,10 +88,17 @@ int** createMatrix ( SPPoint* arr, int size){
 
 
 
-int** buildTwoMaps (int* sortedPoints){
-	int** maps = (int**) malloc (sizeof (sortedPoints)*2);
-	int len = sizeof (sortedPoints)/sizeof (int);
-	int i =0;
+int** buildTwoMaps (int* sortedPoints, int len){
+	int **maps;
+	int i=0;
+
+	//printf ("%d",len);
+	maps=(int **) malloc(2*sizeof(int *));
+	for(i=0;i<2;i++){
+		maps[i]=(int *) malloc(len*sizeof(int));
+	}
+
+	i =0;
 	int half;
 	int cnt1=0;
 	int cnt2 =0;
@@ -103,12 +110,14 @@ int** buildTwoMaps (int* sortedPoints){
 	}
 	for (i=0;i<len;i++){
 		int index = sortedPoints[i];
-		if (i<half+1){
+		if (i<(half)){
+			//printf ("%d",half);
 			maps[0][index] = cnt1;
 			maps[1][index] = -1;
 			cnt1++;
 		}
 		else{
+			//printf ("g");
 			maps[0][index] = -1;
 			maps[1][index] = cnt2;
 			cnt2++;
@@ -118,16 +127,29 @@ int** buildTwoMaps (int* sortedPoints){
 	return maps;
 }
 
- SPPoint** splitPointArray (int**maps ,  SPPoint* array){
-	 SPPoint** pointArrays = ( SPPoint**) malloc ((sizeof (array)/sizeof (SPPoint))*2);
-	int len = sizeof (array)/sizeof (SPPoint);
+ SPPoint** splitPointArray (int**maps ,  SPPoint* array, int len){
+	SPPoint** pointArrays;
 	int i=0;
+	pointArrays=(SPPoint**) malloc(2*sizeof(SPPoint *));
+	for(i=0;i<2;i++){
+		pointArrays[i]=(SPPoint *) malloc(len*sizeof(SPPoint));
+	}
+	i =0;
+	//int* map1 = maps [0];
+	//printf ("%d",map1[0]);
+	//int ** maps2 = maps;
+
 	for (i =0; i<len;i++){
+
 		if (maps[0][i]==-1){
+
+
 			int j = maps[1][i];
 			pointArrays[1][j] = array[i];
 		}
 		else{
+
+			//maps[0][i];
 			int j = maps[0][i];
 			pointArrays[0][j] = array[i];
 		}
@@ -136,47 +158,63 @@ int** buildTwoMaps (int* sortedPoints){
 
 }
 
-int*** splitMatrixes (int**maps, int**matrix){
-	int*** matrixArrays = (int***) malloc (sizeof(matrix));
-		int len = sizeof (*maps)/sizeof(int);
-		int i=0;
-		for (i =0; i<len;i++){
-			if (maps[0][i]==-1){
-				int j = maps[1][i];
-				matrixArrays [1][j] = matrix[i];
-			}
-			else{
-				int j = maps[0][i];
-				matrixArrays[0][j] = matrix[i];
-			}
-		}
-		return matrixArrays;
-}
-
-void SPKDArrayDestroy (SPKDArray kdArr){
+int*** splitMatrixes (int**maps, int**matrix, int len, int dim){
+	int*** matrixArrays;
 	int i=0;
-	for (i=0; i<(sizeof (kdArr->p)/sizeof (SPPoint));i++){
-		spPointDestroy (kdArr->p[i]);
+	int j=0;
+	matrixArrays=(int***) malloc(2*sizeof(int **));
+	for(i=0;i<2;i++){
+		matrixArrays[i]=(int **) malloc(dim*sizeof(int*));
+		for (j=0;j<dim;j++){
+			matrixArrays[i][j]=(int*) malloc(len*sizeof(int));
+		}
 	}
-	free (kdArr->p);
+	i =0;
+	j=0;
+	for (i =0; i<len;i++){
+		if (maps[0][i]==-1){
+			int j = maps[1][i];
+			matrixArrays [1][j] = matrix[i];
+		}
+		else{
+			int j = maps[0][i];
+			matrixArrays[0][j] = matrix[i];
+		}
+	}
+	return matrixArrays;
+}
 
-	for(i=0;i<(sizeof (kdArr->matrix)/sizeof (int*));i++){
-		free (kdArr->matrix[i]);
+void SPKDArrayDestroy (SPKDArray kdArr, int len){
+
+	if(kdArr != NULL) {
+		int i=0;
+		for(i=0;i< spPointGetDimension(kdArr->p[0]) ;i++){
+			free (kdArr->matrix[i]);
+		}
+		free (kdArr->matrix);
+
+		i=0;
+		for (i=0; i<len;i++){
+			spPointDestroy (kdArr->p[i]);
+		}
+		free (kdArr->p);
+		free(kdArr);
 	}
-	free (kdArr->matrix);
+
+
 }
 
 
-SPKDArray**  Split( SPKDArray kdArr, int coor){
+SPKDArray**  Split( SPKDArray kdArr, int coor, int len){
 	int** matrix = (kdArr->matrix);
 	int * matcoor = matrix [coor];
-	int ** maps =  buildTwoMaps(matcoor);
+	int ** maps =  buildTwoMaps(matcoor,len);
 
 
 	SPPoint** pointArrays = ( SPPoint**) malloc (sizeof (kdArr->p));
-	pointArrays = splitPointArray (maps, kdArr->p);
+	pointArrays = splitPointArray (maps, kdArr->p, len);
 	int*** matrixes = (int***) malloc (sizeof (kdArr-> matrix));
-	matrixes = splitMatrixes (maps, kdArr-> matrix);
+	matrixes = splitMatrixes (maps, kdArr-> matrix,len,  spPointGetDimension((kdArr->p)[0]));
 	 SPKDArray* newSPKDArray = ( SPKDArray*) malloc (2*sizeof ( SPKDArray));
 	 SPKDArray left = newSPKDArray[0];
 	 SPKDArray right = newSPKDArray[1];
@@ -186,7 +224,7 @@ SPKDArray**  Split( SPKDArray kdArr, int coor){
 	right->matrix=matrixes[1];
 
 	free(maps);
-	SPKDArrayDestroy (kdArr);
+	SPKDArrayDestroy (kdArr, len);
 	return &newSPKDArray;
 
 }
