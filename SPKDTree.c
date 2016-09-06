@@ -9,13 +9,13 @@ struct sp_kd_tree_node_t{
 	double val;
 	SPKDTreeNode left;
 	SPKDTreeNode right;
-	SPPoint* data;
+	SPPoint data;
 };
 
-SPKDTree InitTree(SPPoint* arr, int size, int splitMethod){
+SPKDTree spInitTree(SPPoint* arr, int size, SDKTreeSpresd splitMethod, int spPCADimension){
 	SPKDTree newTree;
-	SPKDArray kdArray;
-	int dim;
+	SPKDArray kdArray = NULL;
+	int dim = 0;
 
 	newTree = (SPKDTree) malloc(sizeof(*newTree)); //allocating memory for the new tree
 	if(newTree == NULL) { //Allocation Fails
@@ -24,15 +24,13 @@ SPKDTree InitTree(SPPoint* arr, int size, int splitMethod){
 
 	kdArray = Init(arr, size);
 
-	if(splitMethod == 0){
-		//MAX_SPREAD
-		//dim = FindMaxSpread(kdArray);
-		dim = 0; //???????????????????????????????????????????????
+	if(splitMethod == MAX_SPREAD){
+		dim = spKDArrayFindMaxSpreadDim(kdArray);
 	}
-	else if(splitMethod == 1)
+	else if(splitMethod == RANDOM)
 	{
-		//RANDOM
-		dim = 0; //??????????????????????????????????????????????????
+		srand(time(NULL));
+		dim = rand() % spPCADimension;
 	}
 	else
 	{
@@ -40,12 +38,12 @@ SPKDTree InitTree(SPPoint* arr, int size, int splitMethod){
 		dim = 0;
 	}
 
-	newTree->head = TreeBuilder(kdArray, size, dim, splitMethod);
+	newTree->head = spTreeBuilder(kdArray, size, dim, splitMethod, spPCADimension);
 
 	return newTree;
 }
 
-SPKDTreeNode TreeBuilder(SPKDArray kdArr, int size, int dim, int splitMethod){
+SPKDTreeNode spTreeBuilder(SPKDArray kdArr, int size, int dim, SDKTreeSpresd splitMethod, int spPCADimension){
 	SPKDTreeNode newNode;
 	SPKDArray* splitArrays;
 	int leftSize, newDim;
@@ -59,8 +57,8 @@ SPKDTreeNode TreeBuilder(SPKDArray kdArr, int size, int dim, int splitMethod){
 		newNode->dim = -1;
 		newNode->left = NULL;
 		newNode->right = NULL;
-		newNode->val = -1; //invalid???????????????????????????????????????????????????????
-		newNode->data = kdArr->p[0]; //??????????????????????????????????????????????????? pointer to point
+		newNode->val = -1;
+		newNode->data = spKDArrayGetPoint(kdArr, 0);
 		return newNode;
 	}
 
@@ -74,22 +72,88 @@ SPKDTreeNode TreeBuilder(SPKDArray kdArr, int size, int dim, int splitMethod){
 		leftSize = floor(size/2);
 	}
 
-	newNode->val = kdArr->p[kdArr->matrix[dim][leftSize]];
+	newNode->val = spKDArrayGetMedianValue(kdArr, dim, size);
 
 	newDim = dim;
-	if(splitMethod == 2){
+	if(splitMethod == INCREMENTAL){
 		newDim = dim + 1;
-		newDim = newDim % kdArr->p[0]->dim;
+		newDim = newDim % spPCADimension;
 	}
 
 	splitArrays = Split(kdArr, newDim);
 
-	newNode->left = TreeBuilder(splitArrays[0], leftSize, newDim, splitMethod);
-	newNode->right = TreeBuilder(splitArrays[1], size - leftSize, newDim, splitMethod);
+	newNode->left = spTreeBuilder(splitArrays[0], leftSize, newDim, splitMethod, spPCADimension);
+	newNode->right = spTreeBuilder(splitArrays[1], size - leftSize, newDim, splitMethod, spPCADimension);
 
 	SPKDArrayDestroy(kdArr);
 
 	return newNode;
+}
+
+void spKNNSearch(SPKDTree tree, SPPoint queryPoint, int spKNN, int* imgArray){
+	SPBPQueue bpq;
+
+	bpq = spBPQueueCreate(spKNN);
+
+	spKNNSearchRecurr(tree->head, queryPoint, bpq);
+
+	while(!spBPQueueIsEmpty(bpq)){
+		SPListElement listEle = spBPQueuePeek(bpq);
+		int imgIndex = spListElementGetIndex(listEle);
+		spListElementDestroy(listEle);
+
+		imgArray[imgIndex]++;
+	}
+
+	spBPQueueDestroy(bpq);
+
+}
+
+void spKNNSearchRecurr(SPKDTreeNode currentNode, SPPoint queryPoint, SPBPQueue bpq){
+	bool leftSub = false;
+	double sqrdLDist;
+	SPListElement listEle;
+	int maxDist;
+
+	if(currentNode == NULL)
+		return;
+
+	listEle = spBPQueuePeekLast(bpq);
+	maxDist = spListElementGetValue(listEle);
+	spListElementDestroy(listEle);
+
+	if(spIsLeaf(currentNode)){
+		sqrdLDist = spPointL2SquaredDistance(currentNode->data, queryPoint);
+		listEle = spListElementCreate(spPointGetIndex(currentNode->data), sqrdLDist);
+		if(!spBPQueueIsFull(bpq) || maxDist > sqrdLDist){
+			spBPQueueEnqueue(bpq,listEle);
+		}
+		else if(maxDist > sqrdLDist){
+			spBPQueueEnqueue(bpq,listEle);
+			spBPQueueDequeue(bpq); //??????????????????????????????????????
+		}
+		spListElementDestroy(listEle);
+		return;
+	}
+
+	if(spPointGetAxisCoor(queryPoint, currentNode->dim) <= currentNode->val){
+		spKNNSearchRecurr(currentNode->left, queryPoint, bpq);
+		leftSub = true;
+	}
+	else{
+		spKNNSearchRecurr(currentNode->right, queryPoint, bpq);
+	}
+
+	sqrdLDist = sqrt(currentNode->val - spPointGetAxisCoor(queryPoint, currentNode->dim));
+	if(!spBPQueueIsFull(bpq) || maxDist > sqrdLDist){
+		if(leftSub){
+			spKNNSearchRecurr(currentNode->left, queryPoint, bpq);
+			leftSub = true;
+		}
+		else{
+			spKNNSearchRecurr(currentNode->right, queryPoint, bpq);
+		}
+	}
 }
 
 void spKDTreeDestroy(SPKDTree tree){
@@ -103,6 +167,16 @@ void spKDTreeDestroyNode(SPKDTreeNode node){
 	if(node != NULL){
 		spKDTreeDestroyNode(node->left);
 		spKDTreeDestroyNode(node->right);
+		spPointDestroy(node->data);
 		free (node);
 	}
 }
+
+bool spIsLeaf(SPKDTreeNode node)
+{
+	if(node->left == NULL && node->right == NULL)
+		return true;
+	else return false;
+}
+
+
