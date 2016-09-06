@@ -65,13 +65,14 @@ int main(char * args){
 // recive command
 
 // query?
+	query:
 	char queryImgPath[1024];
     printf("Please enter an image path:\n");
     scanf("%s", queryImgPath);
 
 // no: exit
 if (queryImgPath== '<>'){
-	//exit
+	goto ending;
 }
 int NumOfImages = spConfigGetNumOfImages(configFile,spConfigMsg);
 int spKNN = spConfigGetspKNN(configFile,spConfigMsg);
@@ -105,30 +106,33 @@ for (i=0;i<NumOfSimilarImages;i++){
 	SimilarImagesArr[i]= max;
 	imgArray[max] =-1;
 }
+char * imagePath = malloc (1024*sizeof(char));
 i=0;
-for (i=0;i<NumOfSimilarImages;i++){
+if(spConfigMinimalGui(configFile,spConfigMsg)){
 
+	for (i=0;i<NumOfSimilarImages;i++){
+		spConfigGetImagePath(imagePath, configFile, SimilarImagesArr[i]);
+		showImage(imagePath);
+		//wait
+	}
 }
+else{
+	printf("Best candidates for - %d - are:\n",queryImgPath);
+	for (i=0;i<NumOfSimilarImages;i++){
+		spConfigGetImagePath(imagePath, configFile, SimilarImagesArr[i]);
+		printf ("%d\n",imagePath);
+
+	}
+}
+goto query;
+ending:
+// ending
+//frees ();
+return 0;
+
 
 
 
 };
-// yes: find similar images
-/*
- * In the final project, we will search for the spNumOfSimilarImages most similar images (notice that spNumOfSimilarImages in Assignment no. 2 was 5) as follow:
-1. We will store all features in a special data-structure called KD-TREE (refer to the lecture slides for more information). The construction time of the KD-TREE should be in 𝑂(𝑑×𝑛𝑙𝑜𝑔(𝑛)) where 𝑑=𝑠𝑝𝑃𝐶𝐴𝐷𝑖𝑚𝑒𝑛𝑠𝑖𝑜𝑛 and 𝑛=𝑡ℎ𝑒 𝑡𝑜𝑡𝑎𝑙 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑓𝑒𝑎𝑡𝑢𝑟𝑒𝑠 𝑓𝑜𝑟 𝑎𝑙𝑙 𝑖𝑚𝑎𝑔𝑒𝑠 𝑖𝑛 𝑠𝑝𝐼𝑚𝑎𝑔𝑒𝑠𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
-2. For each feature 𝑓𝑖 of the query image, find the k-nearest features (k = spKNN) with respect to 𝑓𝑖 using the k-nearest-neighbor search algorithm (more later).
-3. For each image 𝑖𝑚𝑔𝑖 in spImagesDirectory , keep track of the number of times a feature of 𝑖𝑚𝑔𝑖 is among the spKNN nearest features with respect to some feature 𝑓𝑖 in step 2.
-4. Display the images in spImagesDirectory with the highest spNumOfSimilarImages ranks as calculated in step 3.
- *
- */
-/*
-// show results
-
-
-
-return 0;
-}
-
 
 
