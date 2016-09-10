@@ -53,7 +53,7 @@ int compare (const SPPoint *a, const SPPoint *b)
 	return 0;
 }
 int** createMatrix ( SPPoint* arr, int size){
-	//printf("Hello world");
+
 	int dim = spPointGetDimension(arr[0]);
 	int **matrix;
 	int i=0;
@@ -87,12 +87,10 @@ int** createMatrix ( SPPoint* arr, int size){
 
 
 
-
 int** buildTwoMaps (int* sortedPoints, int len){
 	int **maps;
 	int i=0;
 
-	//printf ("%d",len);
 	maps=(int **) malloc(2*sizeof(int *));
 	for(i=0;i<2;i++){
 		maps[i]=(int *) malloc(len*sizeof(int));
