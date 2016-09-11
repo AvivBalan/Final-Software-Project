@@ -138,6 +138,9 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element);
  */
 SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source);
 
+
+SP_BPQUEUE_MSG spBPmaxDequeue(SPBPQueue source);
+
 /**
  * Returns copy of the element with the min value
  *

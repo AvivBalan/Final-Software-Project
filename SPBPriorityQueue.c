@@ -1,3 +1,18 @@
+/*
+ * SPBPriorityQueue.c
+ *
+ *  Created on: 31 במאי 2016
+ *      Author: user
+ */
+
+/*
+ * SPBPriorityQueue.c
+
+
+ *
+ *  Created on: 21 במאי 2016
+ *      Author: user
+ */
 #include "SPBPriorityQueue.h"
 #include "SPList.h"
 #include "SPListElement.h"
@@ -8,6 +23,7 @@
 struct sp_bp_queue_t {
 	SPList list ;
 	int maxSize;
+
 };
 
 
@@ -110,6 +126,34 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element){
 	return SP_BPQUEUE_SUCCESS;
 }
 
+//Removes the max value element of the SPBPQueue
+SP_BPQUEUE_MSG spBPmaxDequeue(SPBPQueue source){
+	if (source == NULL){
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	}
+	int i =0;
+	if (spBPQueueSize(source) == 0){
+		return SP_BPQUEUE_EMPTY;
+	}
+	SPList sourceList = source->list;
+	double max= spListElementGetValue(spListGetFirst(sourceList));
+
+	for (i=1; i<spBPQueueSize(source);i++){
+		SPListElement temp =spListGetNext(sourceList);
+		if (spListElementGetValue(temp)> max){
+			max = spListElementGetValue(temp);
+		}
+	}
+	i=0;
+	spListGetFirst(sourceList);
+	for (i=0; i<spBPQueueSize(source); i++){
+		double nn = spListElementGetValue(spListGetCurrent(sourceList));
+		if (nn == max){
+			spListRemoveCurrent(sourceList);
+			break;
+		}
+		spListGetNext(sourceList);
+	}
 //Removes the min value element of the SPBPQueue
 SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source){
 	if (source == NULL){
