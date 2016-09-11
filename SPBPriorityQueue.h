@@ -138,8 +138,16 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element);
  */
 SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source);
 
-
-SP_BPQUEUE_MSG spBPmaxDequeue(SPBPQueue source);
+/**
+ * Removes the max value element of the SPBPQueue using the function spListRemoveCurrent.
+ *
+ * @param source The SPBPQueue for which the max value element will be removed
+ * @return
+ * SP_BPQUEUE_INVALID_ARGUMENT if source is NULL
+ * SP_BPQUEUE_EMPTY if the source is empty
+ * SP_BPQUEUE_SUCCESS the current element was removed successfully
+ */
+SP_BPQUEUE_MSG spBPQueueMaxDequeue(SPBPQueue source);
 
 /**
  * Returns copy of the element with the min value

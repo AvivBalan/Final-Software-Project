@@ -1,18 +1,3 @@
-/*
- * SPBPriorityQueue.c
- *
- *  Created on: 31 במאי 2016
- *      Author: user
- */
-
-/*
- * SPBPriorityQueue.c
-
-
- *
- *  Created on: 21 במאי 2016
- *      Author: user
- */
 #include "SPBPriorityQueue.h"
 #include "SPList.h"
 #include "SPListElement.h"
@@ -127,7 +112,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element){
 }
 
 //Removes the max value element of the SPBPQueue
-SP_BPQUEUE_MSG spBPmaxDequeue(SPBPQueue source){
+SP_BPQUEUE_MSG spBPQueueMaxDequeue(SPBPQueue source){
 	if (source == NULL){
 		return SP_BPQUEUE_INVALID_ARGUMENT;
 	}
@@ -154,6 +139,9 @@ SP_BPQUEUE_MSG spBPmaxDequeue(SPBPQueue source){
 		}
 		spListGetNext(sourceList);
 	}
+	return SP_BPQUEUE_SUCCESS;
+}
+
 //Removes the min value element of the SPBPQueue
 SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source){
 	if (source == NULL){
@@ -292,4 +280,3 @@ bool spBPQueueIsFull(SPBPQueue source){
 	}
 	return false;
 }
-

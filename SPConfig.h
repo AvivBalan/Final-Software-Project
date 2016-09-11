@@ -57,8 +57,6 @@ typedef struct sp_config_t* SPConfig;
  */
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg);
 
-void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG_MSG* msg, int line, const char* filename);
-
 /*
  * Returns true if spExtractionMode = true, false otherwise.
  *
@@ -100,6 +98,20 @@ bool spConfigMinimalGui(const SPConfig config, SP_CONFIG_MSG* msg);
 int spConfigGetNumOfImages(const SPConfig config, SP_CONFIG_MSG* msg);
 
 /*
+ * Returns the number of images to be found, set in the configuration file, i.e the value
+ * of spNumOfSimilarImages.
+ *
+ * @param config - the configuration structure
+ * @assert msg != NULL
+ * @param msg - pointer in which the msg returned by the function is stored
+ * @return positive integer in success, negative integer otherwise.
+ *
+ * - SP_CONFIG_INVALID_ARGUMENT - if config == NULL
+ * - SP_CONFIG_SUCCESS - in case of success
+ */
+int spConfigGetNumOfSimilarImages(const SPConfig config, SP_CONFIG_MSG* msg);
+
+/*
  * Returns the number of features to be extracted. i.e the value
  * of spNumOfFeatures.
  *
@@ -112,6 +124,19 @@ int spConfigGetNumOfImages(const SPConfig config, SP_CONFIG_MSG* msg);
  * - SP_CONFIG_SUCCESS - in case of success
  */
 int spConfigGetNumOfFeatures(const SPConfig config, SP_CONFIG_MSG* msg);
+
+/*
+ * Returns a positive integer which is used in the k nearest neighbor search algorithm.
+ *
+ * @param config - the configuration structure
+ * @assert msg != NULL
+ * @param msg - pointer in which the msg returned by the function is stored
+ * @return positive integer in success, negative integer otherwise.
+ *
+ * - SP_CONFIG_INVALID_ARGUMENT - if config == NULL
+ * - SP_CONFIG_SUCCESS - in case of success
+ */
+int spConfigGetspKNN(const SPConfig config, SP_CONFIG_MSG* msg);
 
 /**
  * Returns the dimension of the PCA. i.e the value of spPCADimension.
@@ -177,5 +202,44 @@ SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config);
  * If config == NULL nothig is done.
  */
 void spConfigDestroy(SPConfig config);
-bool isEmpty (const SPConfig config);
-#endif /*SPCONFIG_H_?????????????????????????????????????????????????????????????????????????*/
+
+/*
+ * Checks if config is NULL
+ * @param config - the configuration structure
+ * @return true ,if confing is NULL, else false
+ */
+bool spConfigIsEmpty (const SPConfig config);
+
+/*
+ * Returns the split method of the kd tree.
+ *
+ * @param config - the configuration structure
+ * @assert msg != NULL
+ * @param msg - pointer in which the msg returned by the function is stored
+ * @return SDKTreeSpresd in success, negative integer otherwise.
+ *
+ * - SP_CONFIG_INVALID_ARGUMENT - if config == NULL
+ * - SP_CONFIG_SUCCESS - in case of success
+ */
+SDKTreeSpresd spConfigGetSplitMethods(const SPConfig config, SP_CONFIG_MSG* msg);
+
+/*
+ * Initialize (by allocating memory) a new empty configuration structure
+ *
+ * @return SPConfig in success, else NULL
+ */
+SPConfig spConfigInit();
+
+/*
+ * Assign for the configuration structure, the value in the matching variable
+ *
+ * @param config - the configuration structure
+ * @param variable - a string which represents the variable in config
+ * @param value - a string which represents the value to be assigned
+ * @param msg - pointer in which the msg returned by the function is stored
+ * @param line - an integer. the current line in the configuration file
+ * @param filename - a string. the address path of the configuration file
+ */
+void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG_MSG* msg, int line, const char* filename);
+
+#endif /*SPCONFIG_H_*/
