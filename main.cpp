@@ -135,7 +135,18 @@ int main(int argc,char** argv){
 
 	SPPoint* queryFeatures = (SPPoint*) malloc (numOfFeatures * sizeof (SPPoint));
 	char* queryImgPath =(char*)  malloc (1024*sizeof(char)); // should free it
-
+	int* numOfFeats = (int*) malloc (numOfFeatures*sizeof(int));
+	if(numOfFeats==NULL){
+		// error
+		spConfigDestroy (configFilename);
+		free(imgArray);
+		free(queryFeatures);
+		free(SimilarImagesArr);
+		free (imagePath);
+		free (queryImgPath);
+		free(imagesFeaturesArray);
+		return -1;
+	}
 	int max=0;
 	int j=0;
 	int k =0;
@@ -149,7 +160,7 @@ int main(int argc,char** argv){
 		for (i=1;i<numOfImages+1;i++){
 			if (spConfigGetImagePath (imagePath,config,i) == SP_CONFIG_SUCCESS){
 				// using queryFeatures because its only temp use
-				queryFeatures =getImageFeatures (imagePath,int index,int* numOfFeats);
+				queryFeatures =getImageFeatures (imagePath,i,numOfFeats);
 				for (j=0;j<numOfFeatures; j++){
 					imagesFeaturesArray[k]= queryFeatures[j];
 					k++;
@@ -182,7 +193,7 @@ if (queryImgPath== '<>'){
 }
 
 // get query features
-queryFeatures = getImageFeatures(queryImgPath,int index,int* numOfFeats);
+queryFeatures = getImageFeatures(queryImgPath,0,numOfFeats);
 //ERRORS with query features
 if (queryFeatures== NULL){
 	//ERROR
@@ -243,6 +254,7 @@ free (queryFeatures);
 free (queryImgPath);
 free (imgArray);
 free (imagesFeaturesArray);
+free (numOfFeats);
 
 return 0;
 };
