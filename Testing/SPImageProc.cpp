@@ -200,7 +200,6 @@ SPPoint* sp::ImageProc::getImageFeatures(const char* imagePath, int index,
 		for (int j = 0; j < points.cols; j++) {
 			pcaSift[j] = (double) points.at<float>(i, j);
 		}
-		SPPoint k = spPointCreate(pcaSift, pcaDim, index);
 		resPoints[i] = spPointCreate(pcaSift, pcaDim, index);
 	}
 	free(pcaSift);
