@@ -29,6 +29,7 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 		free(numOfFeaturesArray);
 		return NULL; //ERROR
 	}
+	*sumOfFeatures = 0;
 	for (i = 0; i < numOfImages; ++i) {
 		spConfigGetImagePath(imagePath, config, i);
 		features2DArray[i] = imageProc.getImageFeatures(imagePath, i, &temp);
@@ -39,7 +40,7 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 			free(numOfFeaturesArray);
 			return NULL; //ERROR
 		}
-		sumOfFeatures = sumOfFeatures + numOfFeaturesArray[i];
+		*sumOfFeatures = *sumOfFeatures + numOfFeaturesArray[i];
 	}
 	featuresArray = (SPPoint*) malloc(sizeof(SPPoint) * *sumOfFeatures);
 	if(featuresArray == NULL){
@@ -53,7 +54,6 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 			featuresArray[featureCounter] = features2DArray[i][j];
 			featureCounter++;
 		}
-		SPPoint* k =  features2DArray[i];
 		free(features2DArray[i]);
 	}
 	if(spFeatureCreateFeatureFile(featuresArray, "spFeaturesFile.feat", *sumOfFeatures, spConfigGetPCADim(config, msg)) == 1){
@@ -97,11 +97,11 @@ int main(int argc, char **argv){
 	//Initializng Logger
 	spConfigGetLoggerFilename(loggerFilename, config);
 	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) spConfigGetLoggerLevel(config, configMsg)) != SP_LOGGER_SUCCESS){
-		spMainAuxFreeMem(1,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
+		spMainAuxFreeMem(0,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1;
 	}
 	//Initializing variables
-	if(spMainAuxInitVariables(config, configMsg, &numOfSimilarImages, similarImageIndices, &numOfImages, imgCounterArray))
+	if(spMainAuxInitVariables(config, configMsg, &numOfSimilarImages, &similarImageIndices, &numOfImages, &imgCounterArray))
 		return 1; //Allocation Error
 	ImageProc imageProc(config);
 	if(spConfigIsExtractionMode(config, configMsg)){ //ExtractionMode

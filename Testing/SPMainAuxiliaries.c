@@ -3,14 +3,14 @@
 
 
 
-int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOfSimilarImages, int* similarImageIndices,
-		int *numOfImages, int* imgCounterArray){
+int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOfSimilarImages, int** similarImageIndices,
+		int *numOfImages, int** imgCounterArray){
 
 	*numOfSimilarImages = spConfigGetNumOfSimilarImages(config, configMsg);
 
-	similarImageIndices = (int*) malloc(*numOfSimilarImages * sizeof(int));
-	if(similarImageIndices == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 28);
+	*similarImageIndices = (int*) malloc(*numOfSimilarImages * sizeof(int));
+	if(*similarImageIndices == NULL){
+		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 11);
 		free(configMsg);
 		spConfigDestroy(config);
 		return 1; //Allocation error
@@ -18,13 +18,10 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOf
 
 	*numOfImages = spConfigGetNumOfImages(config, configMsg);
 
-	imgCounterArray = (int*) calloc(*numOfImages, sizeof(int));
+	*imgCounterArray = (int*) calloc(numOfImages, sizeof(int));
 	if(imgCounterArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 40);
-		free(configMsg);
-		spConfigDestroy(config);
-		free(similarImageIndices);
-		return 1; //Allocation error
+		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.cpp", "spMainAuxInitVariables", 21);
+		return 1;
 	}
 
 	return 0;
