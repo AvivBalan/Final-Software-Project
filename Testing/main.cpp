@@ -116,7 +116,7 @@ int main(int argc, char **argv){
 		}
 	}
 	else{ //nonExtractionMode
-		imagesFeaturesArray = spFeatureExtractFromFeatureFile("spFeaturesFile", &numOfFeaturesDir, &numOfDim);
+		imagesFeaturesArray = spFeatureExtractFromFeatureFile("spFeaturesFile.feat", &numOfFeaturesDir, &numOfDim);
 		if(imagesFeaturesArray == NULL){
 			spMainAuxFreeMem(2,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 			return 1; //ERROR
@@ -207,7 +207,7 @@ int main(int argc, char **argv){
         	return 1;
         }
     }
-	printf("Exiting…\n");
+	printf("ExitingÂ…\n");
 	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 	spLoggerDestroy();
 	return 0;
