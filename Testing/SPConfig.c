@@ -312,7 +312,7 @@ void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG
 	}
 	else if(strcmp(variable,"spPCADimension") == 0){ //spPCADimension
 		config->spPCADimension = atoi(value);
-		if(config->spPCADimension < 10 || config->spPCADimension > 20){
+		if(config->spPCADimension < 10 || config->spPCADimension > 28){
 			*msg = SP_CONFIG_INVALID_INTEGER; //ERROR
 			printf("File: %s\n Line: %d\n Message: Invalid value - constraint not met", filename, line);
 			return;
@@ -328,7 +328,7 @@ void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG
 	}
 	else if(strcmp(variable,"spKDTreeSplitMethod") == 0){ //spKDTreeSplitMethod
 		if(strcmp(value,"MAX_SPREAD") == 0){
-			config->spMinimalGUI = MAX_SPREAD;
+			config->spKDTreeSplitMethod = MAX_SPREAD;
 		}
 		else if(strcmp(value,"RANDOM") == 0){
 			config->spKDTreeSplitMethod = RANDOM;
@@ -452,7 +452,7 @@ SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config, int i
 	}
      //concat ImagesDirectory + ImagesPrefix + index.str + ImagesSuffix
     char indexStr[5];
-    itoa (index, indexStr, 10);
+    sprintf(indexStr,"%d",index);
     strcpy(imagePath, config->spImagesDirectory);
     strcat(imagePath, config->spImagesPrefix);
     strcat(imagePath, indexStr);
