@@ -36,7 +36,7 @@ SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeature
 	SPPoint* featureArray = NULL;
 	int i,j;
 	char* str = NULL;
-	char* errorMsg[1025];
+	char errorMsg[1025];
 
 	spLoggerPrintInfo("Extracting features from file...");
 	if(filename == NULL){
@@ -46,8 +46,8 @@ SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeature
 
 	featureFile = fopen(filename,"r");
 	if (featureFile == NULL){
-		sprintf(*errorMsg, "The features file %s couldn’t be open", filename);
-		spLoggerPrintError(*errorMsg, "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 58);
+		sprintf(errorMsg, "The features file %s couldn’t be open", filename);
+		spLoggerPrintError(errorMsg, "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 58);
 		return NULL; //ERROR
 	}
 	if(fscanf(featureFile,"%d;;%d\n",numOfFeatures,numOfDim) != 2){
