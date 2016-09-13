@@ -1,16 +1,10 @@
 #include "SPMainAuxiliaries.h"
 #include <stdlib.h>
 
-int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, char* imagePath, int *numOfSimilarImages, int* similarImageIndices,
-		int *numOfImages, int* imgCounterArray){
 
-	imagePath = (char*) malloc(sizeof(char) * 1025);
-	if(imagePath == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 17);
-		free(configMsg);
-		spConfigDestroy(config);
-		return 1; //Allocation error
-	}
+
+int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOfSimilarImages, int* similarImageIndices,
+		int *numOfImages, int* imgCounterArray){
 
 	*numOfSimilarImages = spConfigGetNumOfSimilarImages(config, configMsg);
 
@@ -19,7 +13,6 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, char* imag
 		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 28);
 		free(configMsg);
 		spConfigDestroy(config);
-		free(imagePath);
 		return 1; //Allocation error
 	}
 
@@ -30,7 +23,6 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, char* imag
 		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 40);
 		free(configMsg);
 		spConfigDestroy(config);
-		free(imagePath);
 		free(similarImageIndices);
 		return 1; //Allocation error
 	}
@@ -39,7 +31,7 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, char* imag
 }
 
 void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPoint* imagesFeaturesArray, int numOfFeaturesDir, SPKDTree kdTree,
-		SPBPQueue bpqSimilarImages, char* imagePath, int* similarImageIndices, int* imgCounterArray){
+		SPBPQueue bpqSimilarImages, int* similarImageIndices, int* imgCounterArray){
 	int i;
 
 	if(phase >= 5)
@@ -56,8 +48,8 @@ void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPo
 	if(phase >= 1){
 		spConfigDestroy(config);
 		free(configMsg);
-		free(imagePath);
 		free(similarImageIndices);
 		free(imgCounterArray);
+		spLoggerDestroy();
 	}
 }

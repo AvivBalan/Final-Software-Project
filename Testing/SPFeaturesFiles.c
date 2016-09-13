@@ -3,16 +3,11 @@
 int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int numOfFeatures, int numOfDim){
 	FILE *featureFile = NULL;
 	int i,j;
-	char* errorMsg = (char*) malloc(sizeof(char) * 1024);
+	char errorMsg[1025];
 
-	if(errorMsg == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPFeaturesFiles.c", "spFeatureCreateFeatureFile", 6);
-		return 1; //ERROR
-	}
 	spLoggerPrintInfo("Creating features file...");
 	if(filename == NULL){
-		spLoggerPrintError("filename is NULL", "main.cpp", "main", -9999999999999);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		free(errorMsg);
+		spLoggerPrintError("filename is NULL", "main.cpp", "main", -999999);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		return 1; //ERROR
 	}
 	//Opening the file
@@ -20,7 +15,6 @@ int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int nu
 	if (featureFile == NULL){
 		sprintf(errorMsg, "The features file %s couldn’t be open", filename);
 		spLoggerPrintError(errorMsg, "SPFeaturesFiles.c", "spFeatureCreateFeatureFile", 19);
-		free(errorMsg);
 		return 1; //ERROR
 	}
 	//Writing the file
@@ -33,7 +27,6 @@ int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int nu
 		fprintf(featureFile, "\n");
 	}
 	spLoggerPrintInfo("Done creating features file");
-	free(errorMsg);
 	fclose(featureFile);
 	return 0;
 }
@@ -43,24 +36,19 @@ SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeature
 	SPPoint* featureArray = NULL;
 	int i,j;
 	char* str = NULL;
-	char* errorMsg = (char*) malloc(sizeof(char) * 1024);
+	char* errorMsg[1025];
 
-	if(errorMsg == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 46);
-		return NULL; //ERROR
-	}
 	spLoggerPrintInfo("Extracting features from file...");
 	if(filename == NULL){
-		spLoggerPrintError("filename is NULL", "main.cpp", "main", -9999999999999999999999999999999);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		spLoggerPrintError("filename is NULL", "main.cpp", "main", -99999);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		return NULL; //ERROR
 	}
 
 	featureFile = fopen(filename,"r");
 	if (featureFile == NULL){
-		sprintf(errorMsg, "The features file %s couldn’t be open", filename);
-		spLoggerPrintError(errorMsg, "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 58);
-		free(errorMsg);
-		return 1; //ERROR
+		sprintf(*errorMsg, "The features file %s couldn’t be open", filename);
+		spLoggerPrintError(*errorMsg, "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 58);
+		return NULL; //ERROR
 	}
 	if(fscanf(featureFile,"%d;;%d\n",numOfFeatures,numOfDim) != 2){
 		spLoggerPrintError("Wrong feature file format - couldn't read", "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 65);

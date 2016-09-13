@@ -13,9 +13,9 @@ extern "C"{
 using namespace sp;
 
 SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFIG_MSG* msg, int* sumOfFeatures){
-	int i, j, *temp, featureCounter, numOfImages, *numOfFeaturesArray;
+	int i, j, temp, featureCounter, numOfImages, *numOfFeaturesArray;
 	SPPoint *featuresArray, **features2DArray;
-	char* imagePath;
+	char imagePath[1025];
 
 	numOfImages = spConfigGetNumOfImages(config, msg);
 	numOfFeaturesArray = (int*) malloc(sizeof(int) * numOfImages);
@@ -23,29 +23,19 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 		spLoggerPrintError("Memory Allocation Failure", "main.c", "spMainExtractFeaturesDir", 159);
 		return NULL; //ERROR
 	}
-	imagePath = (char*) malloc(sizeof(char) * 1025);
-	if(imagePath == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.c", "spMainExtractFeaturesDir", 164);
-		free(numOfFeaturesArray);
-		return NULL;
-	}
 	features2DArray = (SPPoint**) malloc(sizeof(SPPoint*) * numOfImages);
 	if(features2DArray == NULL){
 		spLoggerPrintError("Memory Allocation Failure", "main.c", "spMainExtractFeaturesDir", 171);
-		free(imagePath);
 		free(numOfFeaturesArray);
 		return NULL; //ERROR
 	}
 	for (i = 0; i < numOfImages; ++i) {
 		spConfigGetImagePath(imagePath, config, i);
-		features2DArray[i] = imageProc.getImageFeatures(imagePath, i, temp);
-		if(features2DArray[i] == NULL)
-			return NULL;
-		numOfFeaturesArray[i] = *temp;
+		features2DArray[i] = imageProc.getImageFeatures(imagePath, i, &temp);
+		numOfFeaturesArray[i] = temp;
 		if(features2DArray[i] == NULL){
 			spLoggerPrintError("Error in sp:ImageProc::getImageFeatures", "main.c", "spMainExtractFeaturesDir", 181);
 			free(features2DArray);
-			free(imagePath);
 			free(numOfFeaturesArray);
 			return NULL; //ERROR
 		}
@@ -54,7 +44,6 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 	featuresArray = (SPPoint*) malloc(sizeof(SPPoint) * *sumOfFeatures);
 	if(featuresArray == NULL){
 		spLoggerPrintError("Memory Allocation Failure", "main.c", "spMainExtractFeaturesDir", 192);
-		free(imagePath);
 		free(numOfFeaturesArray);
 		return NULL; //ERROR
 	}
@@ -64,6 +53,7 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 			featuresArray[featureCounter] = features2DArray[i][j];
 			featureCounter++;
 		}
+		SPPoint* k =  features2DArray[i];
 		free(features2DArray[i]);
 	}
 	if(spFeatureCreateFeatureFile(featuresArray, "spFeaturesFile.feat", *sumOfFeatures, spConfigGetPCADim(config, msg)) == 1){
@@ -78,13 +68,13 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 }
 
 int main(int argc, char **argv){
-	char *configFilename, *loggerFilename, queryImgPath[1025], *imagePath;
+	char *configFilename, loggerFilename[1025], queryImgPath[1025], imagePath[1025];
 	SPConfig config;
 	SP_CONFIG_MSG *configMsg;
-	int i, j, numOfImages, numOfDim, numOfFeaturesDir, numOfFeaturesQuery, *imgCounterArray, numOfSimilarImages, minSimilarFeatures, *similarImageIndices;
-	SPPoint *imagesFeaturesArray, *queryFeatures;
-	SPKDTree kdTree;
-	SPBPQueue bpqSimilarImages;
+	int i, j, numOfImages, numOfDim, numOfFeaturesDir, numOfFeaturesQuery, *imgCounterArray = NULL, numOfSimilarImages, minSimilarFeatures, *similarImageIndices = NULL;
+	SPPoint *imagesFeaturesArray = NULL, *queryFeatures;
+	SPKDTree kdTree = NULL;
+	SPBPQueue bpqSimilarImages = NULL;
 	SPListElement listEle;
 
 	//Command line argument
@@ -105,42 +95,33 @@ int main(int argc, char **argv){
 		return 1; //ERROR
 	}
 	//Initializng Logger
-	loggerFilename = (char*) malloc(sizeof(char) * 1025);
-	if( loggerFilename == NULL){
-		free(configMsg);
-		spConfigDestroy(config);
-		printf("Memory Allocation Failure\nFile: main.cpp\nLine: 30");
-		return 1; //Allocation error
-	}
 	spConfigGetLoggerFilename(loggerFilename, config);
 	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) spConfigGetLoggerLevel(config, configMsg)) != SP_LOGGER_SUCCESS){
-		free(loggerFilename);
-		spMainAuxFreeMem(1,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+		spMainAuxFreeMem(1,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1;
 	}
-	free(loggerFilename);
 	//Initializing variables
-	if(spMainAuxInitVariables(config, configMsg, imagePath, &numOfSimilarImages, similarImageIndices, &numOfImages, imgCounterArray))
+	if(spMainAuxInitVariables(config, configMsg, &numOfSimilarImages, similarImageIndices, &numOfImages, imgCounterArray))
 		return 1; //Allocation Error
 	ImageProc imageProc(config);
 	if(spConfigIsExtractionMode(config, configMsg)){ //ExtractionMode
 		imagesFeaturesArray = spMainExtractFeaturesDir(imageProc, config, configMsg, &numOfFeaturesDir);
 		if(imagesFeaturesArray == NULL){
-			spMainAuxFreeMem(2,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+			spMainAuxFreeMem(2,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 			return 1; //ERROR
 		}
 	}
 	else{ //nonExtractionMode
 		imagesFeaturesArray = spFeatureExtractFromFeatureFile("spFeaturesFile", &numOfFeaturesDir, &numOfDim);
 		if(imagesFeaturesArray == NULL){
-			spMainAuxFreeMem(2,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+			spMainAuxFreeMem(2,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 			return 1; //ERROR
 		}
 	}
 	//Creating KD tree
 	kdTree = spKDTreeCreate(imagesFeaturesArray, numOfFeaturesDir, spConfigGetSplitMethods(config, configMsg), spConfigGetPCADim(config, configMsg));
 	if(kdTree == NULL){
-		spMainAuxFreeMem(3,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+		spMainAuxFreeMem(3,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1; //ERROR
 	}
 	for (i = 0; i < numOfFeaturesDir; ++i)
@@ -149,14 +130,14 @@ int main(int argc, char **argv){
 	//Creating BPQ
 	bpqSimilarImages = spBPQueueCreate(numOfSimilarImages);
 	if(bpqSimilarImages == NULL){
-		spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+		spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1; //ERROR
 	}
 	//Receiving query
 	printf("Please enter an image path:\n");
 	if(scanf("%s", queryImgPath) < 0){
 		spLoggerPrintError("Failed read from command line", "main.c", "main", 80);
-		spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+		spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1;
 	}
 	while(strcmp(queryImgPath, "<>") != 0){
@@ -164,12 +145,12 @@ int main(int argc, char **argv){
 		queryFeatures = imageProc.getImageFeatures(queryImgPath, 0, &numOfFeaturesQuery);
 		if(queryFeatures == NULL){
 			spLoggerPrintError("Error in sp:ImageProc::getImageFeatures", "main.c", "main", 87);
-			spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+			spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 			return 1; //ERROR
 		}
 		for (i = 0; i < numOfFeaturesQuery; ++i){
 			if(spKDTreeKNNSearch(kdTree, queryFeatures[i], spConfigGetspKNN(config, configMsg), imgCounterArray) == 1){
-				spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+				spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 				for (j = 0; j < numOfFeaturesQuery; ++j)
 					spPointDestroy(queryFeatures[j]);
 				free(queryFeatures);
@@ -186,7 +167,7 @@ int main(int argc, char **argv){
 				listEle = spListElementCreate(i, imgCounterArray[i]);
 				if(listEle == NULL){
 					spLoggerPrintError("Memory Allocation Failure", "main.c", "main", 109);
-					spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+					spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 					return 1; //ERROR
 					}
 				spBPQueueEnqueue(bpqSimilarImages,listEle);
@@ -215,11 +196,11 @@ int main(int argc, char **argv){
     	printf("Please enter an image path:\n");
         if(scanf("%s", queryImgPath) < 0){
         	spLoggerPrintError("Failed read from command line", "main.c", "main", 142);
-        	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+        	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
         	return 1;
         }
     }
 	printf("Exiting…\n");
-	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,imagePath,similarImageIndices,imgCounterArray);
+	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 	return 0;
 }
