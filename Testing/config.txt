@@ -1,0 +1,14 @@
+spImagesDirectory = ./images/
+spImagesPrefix = img
+spImagesSuffix= .png 
+spNumOfImages =	17	
+spMinimalGUI = false
+spKDTreeSplitMethod = INCREMENTAL
+spPCAFilename = pca.yml
+spExtractionMode = true 
+spNumOfFeatures = 100
+spPCADimension = 20
+spNumOfSimilarImages = 5
+spKNN = 1 		 
+spLoggerLevel = 4
+spLoggerFilename = log.txt
