@@ -75,13 +75,13 @@ int main(int argc, char **argv){
 	SPPoint *imagesFeaturesArray = NULL, *queryFeatures;
 	SPKDTree kdTree = NULL;
 	SPBPQueue bpqSimilarImages = NULL;
-	SPListElement listEle;
 
 	//Command line argument
 	configFilename = NULL;
 	for (i = 1; i < argc; ++i)
 		if((strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "-C") == 0) && i + 1 < argc)
 			configFilename = argv[i+1];
+
 	//Creating Config
 	configMsg = (SP_CONFIG_MSG*) malloc (sizeof(SP_CONFIG_MSG));
 	if(configMsg == NULL)
@@ -94,16 +94,20 @@ int main(int argc, char **argv){
 		free(configMsg);
 		return 1; //ERROR
 	}
-	//Initializng Logger
+
+	//Initializing Logger
 	spConfigGetLoggerFilename(loggerFilename, config);
-	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) spConfigGetLoggerLevel(config, configMsg)) != SP_LOGGER_SUCCESS){
+	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) (spConfigGetLoggerLevel(config, configMsg) - 1)) != SP_LOGGER_SUCCESS){
 		spMainAuxFreeMem(0,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1;
 	}
+
 	//Initializing variables
 	if(spMainAuxInitVariables(config, configMsg, &numOfSimilarImages, &similarImageIndices, &numOfImages, &imgCounterArray))
 		return 1; //Allocation Error
 	ImageProc imageProc(config);
+
+	//ExtractionMode
 	if(spConfigIsExtractionMode(config, configMsg)){ //ExtractionMode
 		imagesFeaturesArray = spMainExtractFeaturesDir(imageProc, config, configMsg, &numOfFeaturesDir);
 		if(imagesFeaturesArray == NULL){
@@ -118,6 +122,7 @@ int main(int argc, char **argv){
 			return 1; //ERROR
 		}
 	}
+
 	//Creating KD tree
 	kdTree = spKDTreeCreate(imagesFeaturesArray, numOfFeaturesDir, spConfigGetSplitMethods(config, configMsg), spConfigGetPCADim(config, configMsg));
 	if(kdTree == NULL){
@@ -127,12 +132,14 @@ int main(int argc, char **argv){
 	for (i = 0; i < numOfFeaturesDir; ++i)
 		spPointDestroy(imagesFeaturesArray[i]);
 	free(imagesFeaturesArray);
+
 	//Creating BPQ
 	bpqSimilarImages = spBPQueueCreate(numOfSimilarImages);
 	if(bpqSimilarImages == NULL){
 		spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
 		return 1; //ERROR
 	}
+
 	//Receiving query
 	printf("Please enter an image path:\n");
 	if(scanf("%s", queryImgPath) < 0){
@@ -164,7 +171,7 @@ int main(int argc, char **argv){
 			if(!spBPQueueIsFull(bpqSimilarImages) || imgCounterArray[i] > minSimilarFeatures){
 				if(spBPQueueIsFull(bpqSimilarImages))
 					spBPQueueDequeue(bpqSimilarImages);
-				listEle = spListElementCreate(i, imgCounterArray[i]);
+				SPListElement listEle = spListElementCreate(i, imgCounterArray[i]);
 				if(listEle == NULL){
 					spLoggerPrintError("Memory Allocation Failure", "main.c", "main", 109);
 					spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
@@ -178,8 +185,8 @@ int main(int argc, char **argv){
 			similarImageIndices[i] = spListElementGetIndex(spBPQueuePeekLast(bpqSimilarImages));
 			spBPQueueMaxDequeue(bpqSimilarImages);
 		}
-		spBPQueueDestroy(bpqSimilarImages);
-		//Show Results
+
+		//Showing Results
 		if(spConfigMinimalGui(config, configMsg)) { //Minimal GUI
 			for (i = 0; i < numOfSimilarImages; ++i){
 				spConfigGetImagePath(imagePath, config, similarImageIndices[i]);
@@ -202,5 +209,6 @@ int main(int argc, char **argv){
     }
 	printf("Exiting…\n");
 	spMainAuxFreeMem(5,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,bpqSimilarImages,similarImageIndices,imgCounterArray);
+	spLoggerDestroy();
 	return 0;
 }

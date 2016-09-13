@@ -18,7 +18,7 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOf
 
 	*numOfImages = spConfigGetNumOfImages(config, configMsg);
 
-	*imgCounterArray = (int*) calloc(numOfImages, sizeof(int));
+	*imgCounterArray = (int*) calloc(*numOfImages, sizeof(int));
 	if(imgCounterArray == NULL){
 		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.cpp", "spMainAuxInitVariables", 21);
 		return 1;
@@ -47,6 +47,5 @@ void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPo
 		free(configMsg);
 		free(similarImageIndices);
 		free(imgCounterArray);
-		spLoggerDestroy();
 	}
 }
