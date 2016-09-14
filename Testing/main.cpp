@@ -159,6 +159,15 @@ int main(int argc, char **argv){
 		return 1; //ERROR
 	}
 
+	//Initializing variables
+	imgCounterArray = (int*) calloc(spConfigGetNumOfImages(config, configMsg), sizeof(int));
+	if(imgCounterArray == NULL){
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "main", 21);
+		free(configMsg);
+		spConfigDestroy(config);
+		return 1;
+	}
+
 	//Initializing Logger
 	spConfigGetLoggerFilename(loggerFilename, config);
 	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) (spConfigGetLoggerLevel(config, configMsg) - 1)) != SP_LOGGER_SUCCESS){
@@ -166,13 +175,6 @@ int main(int argc, char **argv){
 		return 1;
 	}
 
-	//Initializing variables
-	imgCounterArray = (int*) calloc(spConfigGetNumOfImages(config, configMsg), sizeof(int));
-	if(imgCounterArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "main", 21);
-		spMainAuxFreeMem(0,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,imgCounterArray);
-		return 1;
-	}
 	ImageProc imageProc(config);
 
 	//Extraction
@@ -236,7 +238,7 @@ int main(int argc, char **argv){
         for (i = 0; i < spConfigGetNumOfImages(config, configMsg); ++i)
         	imgCounterArray[i] = 0;
     }
-	printf("Exiting…\n");
+	printf("Exiting...\n");
 	spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,imgCounterArray);
 	spLoggerDestroy();
 	return 0;
