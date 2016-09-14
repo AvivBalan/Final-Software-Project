@@ -27,12 +27,10 @@ int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOf
 	return 0;
 }
 
-void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPoint* imagesFeaturesArray, int numOfFeaturesDir, SPKDTree kdTree,
-		SPBPQueue bpqSimilarImages, int* similarImageIndices, int* imgCounterArray){
+void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPoint* imagesFeaturesArray, int numOfFeaturesDir, SPKDTree kdTree, int* similarImageIndices, int* imgCounterArray){
 	int i;
 
-	if(phase >= 5)
-		spBPQueueDestroy(bpqSimilarImages);
+	spLoggerPrintInfo("Exiting...");
 	if(phase >= 4)
 		spKDTreeDestroy(kdTree);
 	if(phase == 3){

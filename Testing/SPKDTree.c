@@ -121,10 +121,9 @@ int spKDTreeKNNSearch(SPKDTree tree, SPPoint queryPoint, int spKNN, int* imgArra
 	while(!spBPQueueIsEmpty(bpq)){
 		SPListElement listEle = spBPQueuePeek(bpq);
 		int imgIndex = spListElementGetIndex(listEle);
+		imgArray[imgIndex]++;
 		spListElementDestroy(listEle);
 		spBPQueueDequeue(bpq);
-
-		imgArray[imgIndex]++;
 	}
 
 	spBPQueueDestroy(bpq);
@@ -135,7 +134,7 @@ int spKDTreeKNNSearchRecurr(SPKDTreeNode currentNode, SPPoint queryPoint, SPBPQu
 	bool leftSub = false;
 	double sqrdLDist;
 	SPListElement listEle;
-	int maxDist;
+	double maxDist;
 
 	maxDist = spBPQueueMaxValue(bpq);
 
@@ -150,8 +149,8 @@ int spKDTreeKNNSearchRecurr(SPKDTreeNode currentNode, SPPoint queryPoint, SPBPQu
 				return 1; //ERROR
 			}
 			spBPQueueEnqueue(bpq,listEle);
+			spListElementDestroy(listEle);
 		}
-		spListElementDestroy(listEle);
 		return 0;
 	}
 
