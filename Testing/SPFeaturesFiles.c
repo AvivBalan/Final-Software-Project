@@ -1,6 +1,6 @@
 #include "SPFeaturesFiles.h"
 
-int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int numOfFeatures, int numOfDim){
+int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int numOfImages,int numOfFeatures, int numOfDim){
 	FILE *featureFile = NULL;
 	int i,j;
 	char errorMsg[1025];
@@ -18,7 +18,8 @@ int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int nu
 		return 1; //ERROR
 	}
 	//Writing the file
-	fprintf(featureFile,"%d;;%d\n",numOfFeatures,numOfDim); //First line - overall number of features and number of dimensions of the features
+	//First line - 1- number of images 2- overall number of features 3- number of dimensions of the features
+	fprintf(featureFile,"%d;;%d;;%d\n",numOfImages,numOfFeatures,numOfDim);
 	for (i = 0; i < numOfFeatures; ++i) {	//Feature line - First the matching index of the img and the each coordinate
 		fprintf(featureFile,"%d;;",spPointGetIndex(pointArray[i]));
 		for (j = 0; j < numOfDim; ++j) {
@@ -31,10 +32,10 @@ int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int nu
 	return 0;
 }
 
-SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeatures, int *numOfDim){
+SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int numOfImages,int *numOfFeatures, int *numOfDim){
 	FILE *featureFile = NULL;
 	SPPoint* featureArray = NULL;
-	int i,j;
+	int i,j, numOfImagesFile;
 	char* str = NULL;
 	char errorMsg[1025];
 
@@ -50,9 +51,12 @@ SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeature
 		spLoggerPrintError(errorMsg, "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 58);
 		return NULL; //ERROR
 	}
-	if(fscanf(featureFile,"%d;;%d\n",numOfFeatures,numOfDim) != 2){
+	if(fscanf(featureFile,"%d;;%d;;%d\n",&numOfImagesFile,numOfFeatures,numOfDim) != 3){
 		spLoggerPrintError("Wrong feature file format - couldn't read", "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 65);
 		return NULL; //ERROR
+	}
+	if(numOfImages != numOfImagesFile){
+		spLoggerPrintError("Number of images from features file isn't matching the given configuration", "SPFeaturesFiles.c", "spFeatureExtractFromFeatureFile", 65);
 	}
 
 	featureArray = (SPPoint*) malloc(*numOfFeatures * sizeof(SPPoint));

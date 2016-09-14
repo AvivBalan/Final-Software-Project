@@ -4,6 +4,6 @@
 #include "SPPoint.h"
 #include "SPLogger.h"
 
-int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int numOfFeatures, int numOfDim);
+int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int numOfImages,int numOfFeatures, int numOfDim);
 
-SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int *numOfFeatures, int *numOfDim);
+SPPoint* spFeatureExtractFromFeatureFile(const char* filename, int numOfImages,int *numOfFeatures, int *numOfDim);

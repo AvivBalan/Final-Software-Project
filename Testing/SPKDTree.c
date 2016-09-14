@@ -166,7 +166,7 @@ int spKDTreeKNNSearchRecurr(SPKDTreeNode currentNode, SPPoint queryPoint, SPBPQu
 		}
 	}
 
-	sqrdLDist = sqrt(currentNode->val - spPointGetAxisCoor(queryPoint, currentNode->dim));
+	sqrdLDist = pow(currentNode->val - spPointGetAxisCoor(queryPoint, currentNode->dim), 2);
 	if(!spBPQueueIsFull(bpq) || maxDist > sqrdLDist){
 		if(leftSub){
 			if(spKDTreeKNNSearchRecurr(currentNode->right, queryPoint, bpq) == 1){

@@ -1,33 +1,7 @@
 #include "SPMainAuxiliaries.h"
 #include <stdlib.h>
 
-
-
-int spMainAuxInitVariables(SPConfig config, SP_CONFIG_MSG *configMsg, int *numOfSimilarImages, int** similarImageIndices,
-		int *numOfImages, int** imgCounterArray){
-
-	*numOfSimilarImages = spConfigGetNumOfSimilarImages(config, configMsg);
-
-	*similarImageIndices = (int*) malloc(*numOfSimilarImages * sizeof(int));
-	if(*similarImageIndices == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.c", "spMainAuxInitVariables", 11);
-		free(configMsg);
-		spConfigDestroy(config);
-		return 1; //Allocation error
-	}
-
-	*numOfImages = spConfigGetNumOfImages(config, configMsg);
-
-	*imgCounterArray = (int*) calloc(*numOfImages, sizeof(int));
-	if(imgCounterArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPMainAuxiliaries.cpp", "spMainAuxInitVariables", 21);
-		return 1;
-	}
-
-	return 0;
-}
-
-void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPoint* imagesFeaturesArray, int numOfFeaturesDir, SPKDTree kdTree, int* similarImageIndices, int* imgCounterArray){
+void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPoint* imagesFeaturesArray, int numOfFeaturesDir, SPKDTree kdTree, int* imgCounterArray){
 	int i;
 
 	spLoggerPrintInfo("Exiting...");
@@ -43,7 +17,6 @@ void spMainAuxFreeMem(int phase, SPConfig config, SP_CONFIG_MSG *configMsg, SPPo
 	if(phase >= 1){
 		spConfigDestroy(config);
 		free(configMsg);
-		free(similarImageIndices);
 		free(imgCounterArray);
 	}
 }
