@@ -1,9 +1,5 @@
-/*
- * SPBPriorityQueue.h
- *
- *  Created on: 31 במאי 2016
- *      Author: user
- */
+#include "SPList.h"
+#include "SPListElement.h"
 
 #ifndef SPBPRIORITYQUEUE_H_
 #define SPBPRIORITYQUEUE_H_

@@ -34,6 +34,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 	config = spConfigInit(); //Initializing the configuration structure
 	if(config == NULL) { //Allocation Fail
 		*msg = SP_CONFIG_ALLOC_FAIL;
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	configFile = fopen(filename,"r"); //Opening the configuration file
@@ -118,6 +119,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 			variable = (char*)malloc(sizeof(char)*(varLen + 1)); //allocating memory for the new point
 			if (variable == NULL) { //Allocation Fails
 				*msg = SP_CONFIG_ALLOC_FAIL;
+				printf("ERROR - Memory Allocation Failure\n");
 				spConfigDestroy(config);
 				return NULL;
 			}
@@ -128,6 +130,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 			value = (char*) malloc(sizeof(char)*(valLen + 1)); //allocating memory for the new point
 			if (value == NULL) { //Allocation Fails
 				*msg = SP_CONFIG_ALLOC_FAIL;
+				printf("ERROR - Memory Allocation Failure\n");
 				spConfigDestroy(config);
 				return NULL;
 			}
@@ -180,16 +183,17 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg){
 	return config;
 }
 
-
 SPConfig spConfigInit(){
 	SPConfig newConfig = (SPConfig) malloc(sizeof(*newConfig)); //allocating memory for the configuration structure
 	if(newConfig == NULL) { //Allocation Fail
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 
 	newConfig->spImagesDirectory = (char*) malloc(sizeof(char)*1025); //allocating memory for spImagesDirectory
 	if (newConfig->spImagesDirectory == NULL) { //Allocation Fail
 		free(newConfig);
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	*newConfig->spImagesDirectory = '\0';
@@ -197,6 +201,7 @@ SPConfig spConfigInit(){
 	if (newConfig->spImagesPrefix == NULL) { //Allocation Fail
 		free(newConfig->spImagesDirectory);
 		free(newConfig);
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	*newConfig->spImagesPrefix = '\0';
@@ -205,6 +210,7 @@ SPConfig spConfigInit(){
 		free(newConfig->spImagesPrefix);
 		free(newConfig->spImagesDirectory);
 		free(newConfig);
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	*newConfig->spImagesSuffix = '\0';
@@ -214,6 +220,7 @@ SPConfig spConfigInit(){
 		free(newConfig->spImagesPrefix);
 		free(newConfig->spImagesDirectory);
 		free(newConfig);
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	//Assigning default values
@@ -234,6 +241,7 @@ SPConfig spConfigInit(){
 		free(newConfig->spImagesPrefix);
 		free(newConfig->spImagesDirectory);
 		free(newConfig);
+		printf("ERROR - Memory Allocation Failure\n");
 		return NULL;
 	}
 	strcpy(newConfig->spLoggerFilename, "stdout");
@@ -304,7 +312,7 @@ void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG
 	}
 	else if(strcmp(variable,"spPCADimension") == 0){ //spPCADimension
 		config->spPCADimension = atoi(value);
-		if(config->spPCADimension < 10 || config->spPCADimension > 20){
+		if(config->spPCADimension < 10 || config->spPCADimension > 28){
 			*msg = SP_CONFIG_INVALID_INTEGER; //ERROR
 			printf("File: %s\n Line: %d\n Message: Invalid value - constraint not met", filename, line);
 			return;
@@ -320,7 +328,7 @@ void spConfigAssignValue(SPConfig config, char *variable, char *value, SP_CONFIG
 	}
 	else if(strcmp(variable,"spKDTreeSplitMethod") == 0){ //spKDTreeSplitMethod
 		if(strcmp(value,"MAX_SPREAD") == 0){
-			config->spMinimalGUI = MAX_SPREAD;
+			config->spKDTreeSplitMethod = MAX_SPREAD;
 		}
 		else if(strcmp(value,"RANDOM") == 0){
 			config->spKDTreeSplitMethod = RANDOM;
@@ -381,7 +389,6 @@ bool spConfigMinimalGui(const SPConfig config, SP_CONFIG_MSG* msg){
 	bool temp = config-> spMinimalGUI;
 	return temp;
 }
-
 
 int spConfigGetNumOfImages(const SPConfig config, SP_CONFIG_MSG* msg){
 	*msg = SP_CONFIG_SUCCESS;
@@ -445,7 +452,7 @@ SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config, int i
 	}
      //concat ImagesDirectory + ImagesPrefix + index.str + ImagesSuffix
     char indexStr[5];
-    itoa (index, indexStr, 10);
+    sprintf(indexStr,"%d",index);
     strcpy(imagePath, config->spImagesDirectory);
     strcat(imagePath, config->spImagesPrefix);
     strcat(imagePath, indexStr);
@@ -464,6 +471,27 @@ SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config){
     strcpy(pcaPath, config->spImagesDirectory);
     strcat(pcaPath, config->spPCAFilename);
     return SP_CONFIG_SUCCESS ;
+}
+
+SP_CONFIG_MSG spConfigGetLoggerFilename(char* filename, const SPConfig config){
+    if (spConfigIsEmpty(config)){
+    	return SP_CONFIG_INVALID_ARGUMENT;
+    }
+    if (filename == NULL){
+    	return SP_CONFIG_INVALID_ARGUMENT;
+    }
+    strcpy(filename, config->spLoggerFilename);
+    return SP_CONFIG_SUCCESS ;
+}
+
+int spConfigGetLoggerLevel(const SPConfig config, SP_CONFIG_MSG* msg){
+	*msg = SP_CONFIG_SUCCESS;
+	if (spConfigIsEmpty (config)){
+		*msg = SP_CONFIG_INVALID_ARGUMENT;
+		return 0;
+	}
+	int temp = config-> spLoggerLevel;
+	return temp;
 }
 
 void spConfigDestroy(SPConfig config){

@@ -1,4 +1,5 @@
 #include "SPPoint.h"
+#include "SPLogger.h"
 
 /*
  * A data-structure which is used for holding the KDArray. it's fields is:
