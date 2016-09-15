@@ -145,7 +145,7 @@ int spKDTreeKNNSearchRecurr(SPKDTreeNode currentNode, SPPoint queryPoint, SPBPQu
 				spBPQueueMaxDequeue(bpq);
 			listEle = spListElementCreate(spPointGetIndex(currentNode->data), sqrdLDist);
 			if(listEle == NULL){
-				spLoggerPrintError("Memory Allocation Failure", "SPDKTree.c", "spKDTreeKNNSearchRecurr", 147);
+				spLoggerPrintError("Memory Allocation Failure", "SPDKTree.c", "spKDTreeKNNSearchRecurr", 146);
 				return 1; //ERROR
 			}
 			spBPQueueEnqueue(bpq,listEle);

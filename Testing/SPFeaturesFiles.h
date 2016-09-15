@@ -27,11 +27,10 @@ int spFeatureCreateFeatureFile(SPPoint* pointArray, const char* filename, int nu
  * Returns SPPoint array of features based on the features file
  * in 'filename' variable.
  *
-
  * @param filename -  the name of the features file
  * @param numOfImages - number of the images
- * @param numOfFeatures - pointer to the number of the features
- * @param numOfDim - pointer to the number of  dimensions in the SPPoint.
+ * @param numOfFeatures - an integer pointer, the function assign to it the number of features from the file
+ * @param numOfDim - an integer pointer, the function assign to it the number of dimensions of the features from the file
  * @return SPPoint array in success. NULL otherwise
  *
  */

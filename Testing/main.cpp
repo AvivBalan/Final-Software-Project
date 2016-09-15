@@ -20,12 +20,12 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 	numOfImages = spConfigGetNumOfImages(config, msg);
 	numOfFeaturesArray = (int*) malloc(sizeof(int) * numOfImages);
 	if(numOfFeaturesArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 159);
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 21);
 		return NULL; //ERROR
 	}
 	features2DArray = (SPPoint**) malloc(sizeof(SPPoint*) * numOfImages);
 	if(features2DArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 171);
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 26);
 		free(numOfFeaturesArray);
 		return NULL; //ERROR
 	}
@@ -43,12 +43,12 @@ SPPoint* spMainExtractFeaturesDir(ImageProc imageProc, SPConfig config, SP_CONFI
 	}
 	featuresArray = (SPPoint*) malloc(sizeof(SPPoint) * *sumOfFeatures);
 	if(featuresArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 192);
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainExtractFeaturesDir", 44);
 		free(numOfFeaturesArray);
 		return NULL; //ERROR
 	}
 	if(sumOfFeatures == 0){
-		spLoggerPrintError("No features were extracted from the images", "main.cpp", "spMainExtractFeaturesDir", 192);
+		spLoggerPrintError("No features were extracted from the images", "main.cpp", "spMainExtractFeaturesDir", 50);
 		free(features2DArray);
 		free(numOfFeaturesArray);
 		free(featuresArray);
@@ -83,13 +83,13 @@ int spMainShowResults(ImageProc imageProc, int* imgCounterArray,
 
 	indexArray = (int*) malloc(resultsNum * sizeof(int));
 	if(indexArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 11);
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 84);
 		return 1; //Allocation error
 	}
 	//Creating BPQ
 	bpqSimilarImages = spBPQueueCreate(resultsNum);
 	if(bpqSimilarImages == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 80);
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 90);
 		return 1; //ERROR
 	}
 
@@ -100,7 +100,7 @@ int spMainShowResults(ImageProc imageProc, int* imgCounterArray,
 				spBPQueueDequeue(bpqSimilarImages);
 			SPListElement listEle = spListElementCreate(i, imgCounterArray[i]);
 			if(listEle == NULL){
-				spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 109);
+				spLoggerPrintError("Memory Allocation Failure", "main.cpp", "spMainShowResults", 101);
 				return 1; //ERROR
 				}
 			spBPQueueEnqueue(bpqSimilarImages,listEle);
@@ -159,19 +159,19 @@ int main(int argc, char **argv){
 		return 1; //ERROR
 	}
 
-	//Initializing variables
-	imgCounterArray = (int*) calloc(spConfigGetNumOfImages(config, configMsg), sizeof(int));
-	if(imgCounterArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "main", 21);
-		free(configMsg);
-		spConfigDestroy(config);
-		return 1;
-	}
-
 	//Initializing Logger
 	spConfigGetLoggerFilename(loggerFilename, config);
 	if(spLoggerCreate(loggerFilename, (SP_LOGGER_LEVEL) (spConfigGetLoggerLevel(config, configMsg) - 1)) != SP_LOGGER_SUCCESS){
 		spMainAuxFreeMem(0,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,imgCounterArray);
+		return 1;
+	}
+
+	imgCounterArray = (int*) calloc(spConfigGetNumOfImages(config, configMsg), sizeof(int));
+	if(imgCounterArray == NULL){
+		spLoggerPrintError("Memory Allocation Failure", "main.cpp", "main", 169);
+		free(configMsg);
+		spConfigDestroy(config);
+		spLoggerDestroy();
 		return 1;
 	}
 
@@ -200,7 +200,7 @@ int main(int argc, char **argv){
 	//Receiving query
 	printf("Please enter an image path:\n");
 	if(scanf("%s", queryImgPath) < 0){
-		spLoggerPrintError("Failed read from command line", "main.cpp", "main", 80);
+		spLoggerPrintError("Failed read from command line", "main.cpp", "main", 202);
 		spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,imgCounterArray);
 		return 1;
 	}
@@ -231,7 +231,7 @@ int main(int argc, char **argv){
 
     	printf("Please enter an image path:\n");
         if(scanf("%s", queryImgPath) < 0){
-        	spLoggerPrintError("Failed read from command line", "main.cpp", "main", 142);
+        	spLoggerPrintError("Failed read from command line", "main.cpp", "main", 233);
         	spMainAuxFreeMem(4,config,configMsg,imagesFeaturesArray,numOfFeaturesDir,kdTree,imgCounterArray);
         	return 1;
         }

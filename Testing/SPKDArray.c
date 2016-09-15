@@ -44,13 +44,13 @@ int** getMatrix (SPKDArray kdArr){
 
 	SPPoint* newPointArray = (SPPoint*) malloc(sizeof(SPPoint)*arraySize);
 	if(newPointArray == NULL){
-		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 46);
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 45);
 		return NULL; //ERROR
 	}
 	for (i = 0; i < arraySize; i++){
 		newPointArray[i] = spPointCopy(arr[i]);
 		if(newPointArray[i] == NULL){
-			spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 52);
+			spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 51);
 			return NULL; //ERROR
 		}
 	}
