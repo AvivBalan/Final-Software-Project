@@ -23,15 +23,17 @@ int** getMatrix (SPKDArray kdArr){
  SPKDArray spKDArrayCreate(SPPoint* array, int arraySize){
 
 	SPKDArray newSPKDArray = (SPKDArray) malloc(sizeof(*newSPKDArray));
+	if(newSPKDArray == NULL){
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCreate", 25);
+		return NULL; //ERROR
+	}
 	newSPKDArray->pArray = spKDArrayCopyPointArray (array, arraySize);
 	if(newSPKDArray->pArray == NULL){
-		//ERROR
-		return NULL;
+		return NULL; //ERROR
 	}
 	newSPKDArray->matrix = spKDArrayCreateMatrix (array, arraySize);
 	if(newSPKDArray->matrix == NULL){
-		//ERROR
-		return NULL;
+		return NULL;//ERROR
 	}
 	newSPKDArray->arraySize = arraySize;
 	return newSPKDArray;
@@ -42,16 +44,14 @@ int** getMatrix (SPKDArray kdArr){
 
 	SPPoint* newPointArray = (SPPoint*) malloc(sizeof(SPPoint)*arraySize);
 	if(newPointArray == NULL){
-		//ERROR
-		return NULL;
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 45);
+		return NULL; //ERROR
 	}
 	for (i = 0; i < arraySize; i++){
 		newPointArray[i] = spPointCopy(arr[i]);
 		if(newPointArray[i] == NULL){
-			{
-				//ERROR
-				return NULL;
-			}
+			spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCopyPointArray", 51);
+			return NULL; //ERROR
 		}
 	}
 	return newPointArray;
@@ -77,8 +77,8 @@ int** spKDArrayCreateMatrix (SPPoint* arr, int arraySize){
 	globalPointArray = arr;
 	indexArray = (int*) malloc(arraySize * sizeof(i));
 	if(indexArray == NULL){
-		//ERROR
-		return NULL;
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCreateMatrix", 78);
+		return NULL; //ERROR
 	}
 	for (i = 0; i < arraySize; ++i) {
 		indexArray[i] = i;
@@ -86,21 +86,21 @@ int** spKDArrayCreateMatrix (SPPoint* arr, int arraySize){
 
 	matrix = (int **) malloc(dim * sizeof(int*));
 	if(matrix == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCreateMatrix", 87);
 		free(indexArray);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	for(i = 0; i < dim; i++){
 	    matrix[i] = (int *) malloc(arraySize * sizeof(int));
 		if(matrix[i] == NULL){
-			//ERROR
+			spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayCreateMatrix", 95);
 			for (j = 0; j < i; ++j) {
 				free(matrix[j]);
 			}
 			free(matrix);
 			free(indexArray);
-			return NULL;
+			return NULL; //ERROR
 		}
 	}
 
@@ -162,40 +162,38 @@ SPKDArray* spKDArraySplit(SPKDArray kdArr, int dim){
 	int newArraySize[] = {kdArr->arraySize - floor(kdArr->arraySize / 2), floor(kdArr->arraySize / 2)};
 
 	maps =  spKDArrayBuildMaps(kdArr->matrix[dim], kdArr->arraySize);
-	if(maps == NULL){
-		//ERROR
-		return NULL;
-	}
+	if(maps == NULL)
+		return NULL; //ERROR
 
 	newPointArrays = spKDArraySplitPointArray(maps, kdArr->pArray, kdArr->arraySize);
 	if(newPointArrays == NULL){
-		//ERROR
 		spKDArrayFreeMemForSplit(1, kdArr, maps, newMatrixes, newPointArrays, newKDArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	newMatrixes = spKDArraySplitMatrixes (maps, kdArr->matrix, kdArr->arraySize, spPointGetDimension((kdArr->pArray)[0]));
 	if(newMatrixes == NULL){
-		//ERROR
 		spKDArrayFreeMemForSplit(2, kdArr, maps, newMatrixes, newPointArrays, newKDArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	newKDArrays = (SPKDArray*) malloc(2 * sizeof(SPKDArray));
 	if(newKDArrays == NULL){
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplit", 180);
 		spKDArrayFreeMemForSplit(3, kdArr, maps, newMatrixes, newPointArrays, newKDArrays);
+		return NULL; //ERROR
 	}
 	newKDArrays[0] = (SPKDArray) malloc(sizeof(*newKDArrays[0]));
 	if(newKDArrays[0] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplit", 186);
 		spKDArrayFreeMemForSplit(4, kdArr, maps, newMatrixes, newPointArrays, newKDArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 	newKDArrays[1] = (SPKDArray) malloc(sizeof(*newKDArrays[1]));
 	if(newKDArrays[0] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplit", 192);
 		spKDArrayFreeMemForSplit(5, kdArr, maps, newMatrixes, newPointArrays, newKDArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	for (i = 0; i < 2; ++i) {
@@ -213,30 +211,30 @@ int** spKDArrayBuildMaps (int* sortedPointIndexes, int arraySize){
 
 	pointToMap = (int *) malloc(arraySize * sizeof(int));
 	if(pointToMap == NULL){
-		//Error
-		return NULL;
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayBuildMaps", 212);
+		return NULL; //ERROR
 	}
 
 	maps = (int **) malloc(2 * sizeof(int *));
 	if(maps == NULL){
-		//Error
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayBuildMaps", 218);
 		free(pointToMap);
-		return NULL;
+		return NULL; //ERROR
 	}
 	maps[0] = (int *) malloc(arraySize * sizeof(int));
 	if(maps[0] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayBuildMaps", 224);
 		free(pointToMap);
 		free(maps);
-		return NULL;
+		return NULL; //ERROR
 	}
 	maps[1] = (int *) malloc(arraySize * sizeof(int));
 	if(maps[1] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArrayBuildMaps", 231);
 		free(pointToMap);
 		free(maps[0]);
 		free(maps);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	medianIndex = arraySize - floor(arraySize/2);
@@ -272,42 +270,41 @@ int** spKDArrayBuildMaps (int* sortedPointIndexes, int arraySize){
 
 	copiedArray = spKDArrayCopyPointArray(array, arraySize);
 	if(copiedArray == NULL){
-		//ERROR
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	leftArraySize = arraySize - floor(arraySize/2);
 
 	newPointArrays = (SPPoint**) malloc(2 * sizeof(SPPoint *));
 	if(newPointArrays == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitPointArray", 278);
 		for(i = 0; i < arraySize; i++){
 			spPointDestroy(copiedArray[i]);
 		}
 		free(copiedArray);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	newPointArrays[0] = (SPPoint*) malloc(leftArraySize * sizeof(SPPoint));
 	if(newPointArrays[0] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitPointArray", 288);
 		for(i = 0; i < arraySize; i++){
 			spPointDestroy(copiedArray[i]);
 		}
 		free(copiedArray);
 		free(newPointArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 	newPointArrays[1] = (SPPoint*) malloc((arraySize -leftArraySize) * sizeof(SPPoint));
 	if(newPointArrays[1] == NULL){
-		//ERROR
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitPointArray", 298);
 		for(i = 0; i < arraySize; i++){
 			spPointDestroy(copiedArray[i]);
 		}
 		free(copiedArray);
 		free(newPointArrays[0]);
 		free(newPointArrays);
-		return NULL;
+		return NULL; //ERROR
 	}
 
 	for (i = 0; i < arraySize; i++){
@@ -330,8 +327,8 @@ int*** spKDArraySplitMatrixes (int** maps, int** matrix, int numOfPoints, int nu
 
 	newMatrixes = (int***) malloc(2 * sizeof(int **));
 	if(newMatrixes == NULL){
-		//ERROR
-		return NULL;
+		spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitMatrixes", 328);
+		return NULL; //ERROR
 	}
 
 	newNumOfPoints[0] = numOfPoints - floor(numOfPoints/2);
@@ -340,7 +337,7 @@ int*** spKDArraySplitMatrixes (int** maps, int** matrix, int numOfPoints, int nu
 	for(i = 0; i < 2; i++){
 		newMatrixes[i] = (int**) malloc(numOfDimensions * sizeof(int *));
 		if(newMatrixes[i] == NULL){
-			//ERROR
+			spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitMatrixes", 338);
 			if(i == 1)
 			{
 				for(k = 0; k < newNumOfPoints[0]; k++)
@@ -348,12 +345,12 @@ int*** spKDArraySplitMatrixes (int** maps, int** matrix, int numOfPoints, int nu
 				free(newMatrixes[0]);
 			}
 			free(newMatrixes);
-			return NULL;
+			return NULL; //ERROR
 		}
 			for(j = 0; j < numOfDimensions; j++){
 				newMatrixes[i][j] = (int*) malloc(newNumOfPoints[i] * sizeof(int));
 				if(newMatrixes[i][j] == NULL){
-					//ERROR
+					spLoggerPrintError("Memory Allocation Failure", "SPDKArray.c", "spKDArraySplitMatrixes", 351);
 					if(i == 1)
 					{
 						for(k = 0; k < numOfPoints; k++)
@@ -364,7 +361,7 @@ int*** spKDArraySplitMatrixes (int** maps, int** matrix, int numOfPoints, int nu
 						free(newMatrixes[i][k]);
 					free(newMatrixes[i]);
 					free(newMatrixes);
-					return NULL;
+					return NULL; //ERROR
 				}
 		}
 	}

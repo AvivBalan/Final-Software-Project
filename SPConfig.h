@@ -198,6 +198,30 @@ SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config,
 SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config);
 
 /**
+ * The function stores in filename the full path of the logger file.
+ *
+ * @param filename - an address to store the result in, it must contain enough space.
+ * @param config - the configuration structure
+ * @return
+ *  - SP_CONFIG_INVALID_ARGUMENT - if filename == NULL or config == NULL
+ *  - SP_CONFIG_SUCCESS - in case of success
+ */
+SP_CONFIG_MSG spConfigGetLoggerFilename(char* filename, const SPConfig config);
+
+/**
+ * Returns the level of the logger. i.e the value of spConfigGetLoggerLevel.
+ *
+ * @param config - the configuration structure
+ * @assert msg != NULL
+ * @param msg - pointer in which the msg returned by the function is stored
+ * @return an integer between 1 to 4 in success, negative integer otherwise.
+ *
+ * - SP_CONFIG_INVALID_ARGUMENT - if config == NULL
+ * - SP_CONFIG_SUCCESS - in case of success
+ */
+int spConfigGetLoggerLevel(const SPConfig config, SP_CONFIG_MSG* msg);
+
+/**
  * Frees all memory resources associate with config.
  * If config == NULL nothig is done.
  */
